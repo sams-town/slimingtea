@@ -1,0 +1,34 @@
+# ============================================================
+# Homecare WMS — .gitignore
+# ============================================================
+
+# Database SQLite (jangan di-commit)
+*.db
+*.sqlite
+database/homecare.db
+
+# Log files
+logs/*.log
+logs/setup.lock
+
+# Upload foto pasien (jangan di-commit ke git)
+uploads/photos/*
+!uploads/photos/.gitkeep
+
+# Environment / secrets
+.env
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PHP cache
+*.cache
