@@ -182,4 +182,29 @@ CREATE TABLE IF NOT EXISTS `sync_queue` (
   `created_at`            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------
+-- Tabel: sliming_treatments — Master Paket Perawatan Sliming
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `sliming_treatments` (
+  `id`                    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `uuid`                  CHAR(36) NOT NULL UNIQUE,
+  `code`                  VARCHAR(50) NOT NULL UNIQUE,
+  `name`                  VARCHAR(200) NOT NULL,
+  `category`              VARCHAR(100) NULL,
+  `duration_minutes`      SMALLINT UNSIGNED DEFAULT 0,
+  `price`                 DECIMAL(12,0) DEFAULT 0,
+  `description`           TEXT NULL,
+  `include_injections`    TINYINT(1) DEFAULT 0,
+  `injection_type`        VARCHAR(100) NULL,
+  `include_consultation`  TINYINT(1) DEFAULT 1,
+  `session_count`         TINYINT UNSIGNED DEFAULT 1,
+  `is_active`             TINYINT(1) DEFAULT 1,
+  `sort_order`            INT DEFAULT 0,
+  `created_at`            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`            TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at`            TIMESTAMP NULL DEFAULT NULL,
+  INDEX `idx_active` (`is_active`),
+  INDEX `idx_category` (`category`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

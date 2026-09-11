@@ -372,35 +372,63 @@ const UIPatients = {
 
   async submitQuick(e) {
     e.preventDefault();
-    const fd   = new FormData(e.target);
-    const data = Object.fromEntries(fd.entries());
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const origBtn = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" class="opacity-75"/></svg> Menyimpan...`;
 
-    // Bersihkan field kosong
-    Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null; });
+    try {
+      const fd   = new FormData(e.target);
+      const data = Object.fromEntries(fd.entries());
 
-    data.uuid                = generateUUID();
-    data.registration_status = 'quick';
-    data.registration_date   = data.registration_date ?? today();
-    data.visit_count         = 0;
-    data.synced              = 0;
+      Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null; });
 
-    await Sync.saveLocal('patients', data, 'insert');
-
-    if (navigator.onLine) {
-      const res = await API.patients.create(data);
-      if (res.success && res.id) {
-        data.id = res.id;
-        data._serverId = res.id;
-        await DB.put('patients', data);
+      if (!data.name || !data.name.trim()) {
+        showToast('Nama lengkap wajib diisi', 'error'); return;
       }
+      if (!data.sex) {
+        showToast('Jenis kelamin wajib dipilih', 'error'); return;
+      }
+
+      data.uuid                = generateUUID();
+      data.registration_status = 'quick';
+      data.registration_date   = data.registration_date ?? today();
+      data.visit_count         = 0;
+      data.synced              = 0;
+
+      await Sync.saveLocal('patients', data, 'insert');
+
+      let apiError = null;
+      if (navigator.onLine) {
+        const res = await API.patients.create(data);
+        if (res.success && res.id) {
+          data.id = res.id;
+          data._serverId = res.id;
+          data._pending = false;
+          await DB.put('patients', data);
+        } else if (!res.offline) {
+            apiError = res.message || 'Server gagal menyimpan ke server';
+            console.error('[submitQuick] API gagal:', res);
+          }
+      }
+
+      closePatientModal();
+
+      if (apiError) {
+        showToast(`⚠️ Tersimpan lokal (offline): ${data.name}. Server: ${apiError}`, 'warn', 6000);
+      } else {
+        showToast(`✅ ${data.name} berhasil didaftarkan`, 'success');
+      }
+      await this.loadList();
+      setTimeout(() => App.goToPatient(data.uuid), 400);
+
+    } catch (err) {
+      console.error('[submitQuick] Exception:', err);
+      showToast('❌ Gagal: ' + (err.message || err), 'error', 6000);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origBtn;
     }
-
-    closePatientModal();
-    showToast(`✅ ${data.name} berhasil didaftarkan`, 'success');
-    await this.loadList();
-
-    // Langsung buka halaman detail untuk mulai assessment
-    setTimeout(() => App.goToPatient(data.uuid), 400);
   },
 
   // ──────────────────────────────────────────────────────────

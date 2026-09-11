@@ -1,11 +1,21 @@
 # ============================================================
-# Homecare WMS — Apache Configuration (Shared Hosting)
+# Homecare WMS — Apache Configuration (Shared Hosting cPanel)
 # ============================================================
 
+# ── Pass HTTP Authorization ke PHP (fix CGI/FastCGI cPanel) ──
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} ^(.+)
+  RewriteRule ^(.*)$ - [E=HTTP_AUTHORIZATION:%1]
+  RewriteCond %{REDIRECT_HTTP_AUTHORIZATION} ^(.+)
+  RewriteRule ^(.*)$ - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>
+
 # ── Force HTTPS ──────────────────────────────────────────────
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+<IfModule mod_rewrite.c>
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
 
 # ── MIME Types untuk PWA ─────────────────────────────────────
 <IfModule mod_mime.c>
@@ -16,50 +26,76 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # ── Gzip Compression ─────────────────────────────────────────
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml application/xhtml+xml
+  AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
 # ── Browser Caching ──────────────────────────────────────────
 <IfModule mod_expires.c>
   ExpiresActive On
-  ExpiresByType text/css                  "access plus 1 week"
-  ExpiresByType application/javascript    "access plus 1 week"
-  ExpiresByType image/png                 "access plus 1 month"
-  ExpiresByType image/jpeg                "access plus 1 month"
-  ExpiresByType image/webp                "access plus 1 month"
-  ExpiresByType application/manifest+json "access plus 1 day"
+  ExpiresByType text/html                  "access plus 0 seconds"
+  ExpiresByType text/css                   "access plus 1 week"
+  ExpiresByType application/javascript     "access plus 1 week"
+  ExpiresByType application/json           "access plus 0 seconds"
+  ExpiresByType image/png                  "access plus 1 month"
+  ExpiresByType image/jpeg                 "access plus 1 month"
+  ExpiresByType image/webp                 "access plus 1 month"
+  ExpiresByType image/svg+xml              "access plus 1 month"
+  ExpiresByType application/manifest+json  "access plus 1 day"
   <Files "sw.js">
     ExpiresDefault "access plus 0 seconds"
   </Files>
+  <FilesMatch "\.php$">
+    ExpiresDefault "access plus 0 seconds"
+  </FilesMatch>
 </IfModule>
 
 # ── Security Headers ─────────────────────────────────────────
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options        "SAMEORIGIN"
+  Header always set X-XSS-Protection       "1; mode=block"
+  Header always set Referrer-Policy        "strict-origin-when-cross-origin"
   Header always set Service-Worker-Allowed "/"
   <FilesMatch "\.php$">
-    Header always set Access-Control-Allow-Origin  "*"
-    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, X-API-Token"
+    Header always set Access-Control-Allow-Origin   "*"
+    Header always set Access-Control-Allow-Methods  "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers  "Content-Type, Authorization, X-API-Token, X-Requested-With"
+    Header always set Access-Control-Expose-Headers "X-Total-Count"
   </FilesMatch>
 </IfModule>
 
 # ── Blokir akses ke file sensitif ────────────────────────────
-<FilesMatch "\.(db|sqlite|sql|log|env)$">
-  Order allow,deny
-  Deny from all
+<FilesMatch "\.(db|sqlite|sql|log|env|ini|yml|yaml|sh|zip)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
 </FilesMatch>
 
-# ── Blokir akses ke folder sensitif ─────────────────────────
+# ── Blokir folder sensitif KECUALI deploy/webhook.php ────────
 <IfModule mod_rewrite.c>
-  RewriteRule ^(config|database|logs)/.*$ - [F,L]
+  RewriteRule ^config/.*$   - [F,L]
+  RewriteRule ^database/.*$ - [F,L]
+  RewriteRule ^logs/.*$     - [F,L]
+  RewriteRule ^deploy/(?!webhook\.php).*$ - [F,L]
 </IfModule>
 
-# ── Proteksi folder uploads ───────────────────────────────────
+# ── Proteksi folder uploads: blokir eksekusi PHP ─────────────
 <IfModule mod_rewrite.c>
-  RewriteRule ^uploads/.*\.(php|php3|php5|phtml)$ - [F,L]
+  RewriteRule ^uploads/.*\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|aspx|sh|cgi)$ - [F,L]
+</IfModule>
+<IfModule mod_php5.c>
+  php_flag engine off
 </IfModule>
 
 # ── Disable directory listing ─────────────────────────────────
-Options -Indexes
+Options -Indexes -MultiViews
+
+# ── Default charset ───────────────────────────────────────────
+AddDefaultCharset UTF-8

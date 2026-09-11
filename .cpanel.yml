@@ -2,4 +2,13 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/samst652/public_html/slimingtea
-    - /bin/cp -R * $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/rsync -av --exclude='.git' --exclude='.gitignore' --exclude='deploy' --exclude='logs' --exclude='*.log' --delete ./ $DEPLOYPATH/
+    - /bin/chmod -R 755 $DEPLOYPATH
+    - /bin/chmod 644 $DEPLOYPATH/.htaccess $DEPLOYPATH/index.html
+    - /bin/chmod 755 $DEPLOYPATH/api $DEPLOYPATH/config $DEPLOYPATH/assets $DEPLOYPATH/database
+    - /bin/find $DEPLOYPATH -type f -name "*.php" -exec chmod 644 {} \;
+    - /bin/find $DEPLOYPATH -type d -exec chmod 755 {} \;
+    - /bin/mkdir -p $DEPLOYPATH/uploads/photos $DEPLOYPATH/logs
+    - /bin/chmod -R 775 $DEPLOYPATH/uploads $DEPLOYPATH/logs
+    - echo "[cPanel Deploy] $(date) — berhasil deploy ke $DEPLOYPATH" >> $DEPLOYPATH/logs/deploy.log

@@ -14,19 +14,27 @@ const API_TOKEN = 'samstown2025'; // harus sama dengan config.php
 const API = {
   // ---- Base fetch wrapper ----
   async _req(endpoint, method = 'GET', body = null, isFormData = false) {
-    const headers = { 'X-API-Token': API_TOKEN };
+    const headers = {
+      'X-API-Token':        API_TOKEN,
+      'Authorization':      `Bearer ${API_TOKEN}`,
+    };
     if (!isFormData) headers['Content-Type'] = 'application/json';
 
-    const opts = { method, headers };
+    const opts = { method, headers, credentials: 'same-origin' };
     if (body && !isFormData) opts.body = JSON.stringify(body);
     if (body && isFormData)  opts.body = body;
 
     try {
       const res  = await fetch(`${API_BASE}/${endpoint}`, opts);
-      const json = await res.json();
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); }
+      catch { json = { success: false, message: `Server error: ${res.status} — ${text.slice(0,200)}` }; }
+      if (res.status === 401 && !json.success) {
+        console.error('[API] 401 Unauthorized — token/header issue. Res:', json);
+      }
       return json;
     } catch (err) {
-      // Network offline → kembalikan flag offline
       return { success: false, offline: true, message: err.message };
     }
   },
@@ -81,6 +89,20 @@ const API = {
       API._req('notes.php?action=save', 'POST', data),
     delete: (id) =>
       API._req(`notes.php?action=delete&id=${id}`, 'POST'),
+  },
+
+  // ---- Sliming Treatments (Master Data) ----
+  treatments: {
+    list:   (q = '', activeOnly = false) =>
+      API._req(`treatments.php?action=list&q=${encodeURIComponent(q)}&active=${activeOnly ? 1 : 0}`),
+    get:    (id) =>
+      API._req(`treatments.php?action=get&id=${id}`),
+    create: (data) =>
+      API._req('treatments.php?action=create', 'POST', data),
+    update: (id, data) =>
+      API._req(`treatments.php?action=update&id=${id}`, 'POST', data),
+    delete: (id) =>
+      API._req(`treatments.php?action=delete&id=${id}`, 'POST'),
   },
 
   // ---- Sync ----

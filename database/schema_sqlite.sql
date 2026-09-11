@@ -155,3 +155,23 @@ CREATE TABLE IF NOT EXISTS sync_queue (
   last_attempt_at     TEXT NULL,
   created_at          TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS sliming_treatments (
+  id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+  uuid                  TEXT NOT NULL UNIQUE,
+  code                  TEXT NOT NULL UNIQUE,
+  name                  TEXT NOT NULL,
+  category              TEXT NULL,
+  duration_minutes      INTEGER DEFAULT 0,
+  price                 REAL DEFAULT 0,
+  description           TEXT NULL,
+  include_injections    INTEGER DEFAULT 0,
+  injection_type        TEXT NULL,
+  include_consultation  INTEGER DEFAULT 1,
+  session_count         INTEGER DEFAULT 1,
+  is_active             INTEGER DEFAULT 1,
+  sort_order            INTEGER DEFAULT 0,
+  created_at            TEXT DEFAULT (datetime('now')),
+  updated_at            TEXT DEFAULT (datetime('now')),
+  deleted_at            TEXT NULL
+);

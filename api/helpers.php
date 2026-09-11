@@ -17,14 +17,40 @@ function setCorsHeaders(): void {
     }
 }
 
-// --- Auth Token Check ---
+// --- Auth Token Check (kompatibel CGI/FastCGI/cPanel) ---
 function requireAuth(): void {
-    $token = $_SERVER['HTTP_X_API_TOKEN']
-        ?? $_SERVER['HTTP_AUTHORIZATION']
-        ?? ($_GET['token'] ?? '');
-    $token = str_replace('Bearer ', '', $token);
+    $token = '';
+
+    // 1. Coba dari getallheaders() (paling reliable untuk CGI/FastCGI)
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders() ?: [];
+        foreach ($headers as $k => $v) {
+            $kl = strtolower($k);
+            if ($kl === 'x-api-token')           { $token = $v; break; }
+            if ($kl === 'authorization')         { $token = $v; }
+        }
+    }
+
+    // 2. Fallback: $_SERVER (untuk Apache mod_php)
+    if ($token === '') {
+        $token = $_SERVER['HTTP_X_API_TOKEN']
+              ?? $_SERVER['HTTP_AUTHORIZATION']
+              ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+              ?? '';
+    }
+
+    // 3. Fallback terakhir: query param (untuk testing / webhook)
+    if ($token === '') {
+        $token = $_GET['token'] ?? '';
+    }
+
+    $token = preg_replace('/^Bearer\s+/i', '', trim($token));
     if ($token !== API_TOKEN) {
-        jsonResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+        jsonResponse([
+            'success' => false,
+            'message' => 'Unauthorized — token tidak valid atau header tidak terbaca (cPanel CGI). Gunakan Authorization: Bearer.',
+            'debug'   => (defined('WP_DEBUG') && WP_DEBUG) ? true : false
+        ], 401);
     }
 }
 

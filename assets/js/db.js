@@ -4,7 +4,7 @@
 // ============================================================
 
 const DB_NAME    = 'hcwm_db';
-const DB_VERSION = 2; // bumped: fix compound index syntax
+const DB_VERSION = 3; // bumped: added sliming_treatments store
 
 // Object store definitions
 const STORES = {
@@ -14,21 +14,20 @@ const STORES = {
   body_circumferences: { keyPath: 'uuid' },
   patient_photos:      { keyPath: 'uuid' },
   doctor_notes:        { keyPath: 'uuid' },
+  sliming_treatments:  { keyPath: 'uuid' },
   sync_queue:          { keyPath: 'id', autoIncrement: true },
   app_meta:            { keyPath: 'key' },
 };
 
 // Indexes per store
-// FIX: compound index pakai array ['field1','field2'], bukan string '[field1+field2]'
 const INDEXES = {
   patients:            [['name','name',{}], ['phone','phone',{}]],
   initial_assessments: [['patient_id','patient_id',{}]],
-  // FIX: hilangkan compound unique index — cukup index by patient_id
-  // unique constraint sudah dijaga di level UUID (keyPath)
   weekly_monitorings:  [['patient_id','patient_id',{}]],
   body_circumferences: [['patient_id','patient_id',{}]],
   patient_photos:      [['patient_id','patient_id',{}]],
   doctor_notes:        [['patient_id','patient_id',{}]],
+  sliming_treatments:  [['code','code',{unique:true}], ['category','category',{}], ['is_active','is_active',{}]],
   sync_queue:          [['status','status',{}], ['table_name','table_name',{}]],
 };
 

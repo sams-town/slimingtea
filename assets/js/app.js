@@ -20,9 +20,25 @@ const App = {
   // BOOT
   // ──────────────────────────────────────────────────────────
   async init() {
+    // Auth check terlebih dahulu
+    if (typeof Auth !== 'undefined') {
+      const authRes = await Auth.check();
+      if (!authRes.authed) {
+        Auth._showLogin();
+      } else {
+        Auth._hideLogin();
+        if (authRes.user?.username) {
+          const av = document.getElementById('user-avatar');
+          const nm = document.getElementById('user-display');
+          if (av) av.textContent = (authRes.user.username[0] || 'A').toUpperCase();
+          if (nm) nm.textContent = authRes.user.username;
+        }
+      }
+    }
+
     // Register Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('./sw.js')
         .then(reg  => console.log('[SW] Registered:', reg.scope))
         .catch(err => console.warn('[SW] Failed:', err));
     }
@@ -46,7 +62,7 @@ const App = {
     // Render halaman default
     await this.goToPage('patients');
 
-    console.log('[App] Homecare WMS v1.1.0 — ready');
+    console.log('[App] Homecare Sliming v1.2.0 — ready');
   },
 
   // ──────────────────────────────────────────────────────────
@@ -108,6 +124,11 @@ const App = {
       case 'photos':
         if (!this._requirePatient()) return;
         await UIPhotos.render(this._pid());
+        break;
+
+      case 'treatments':
+        this._clearActivePatientUI();
+        if (typeof UITreatments !== 'undefined') await UITreatments.render();
         break;
     }
   },
@@ -216,21 +237,19 @@ const App = {
   _setNavActive(page) {
     document.querySelectorAll('.nav-link').forEach(link => {
       const active = link.dataset.page === page;
-      link.classList.toggle('bg-slate-700', active);
-      link.classList.toggle('text-white',   active);
-      link.classList.toggle('text-slate-300', !active);
-      link.classList.toggle('font-medium',  active);
+      link.classList.toggle('active', active);
     });
   },
 
   _updateTopbar(page) {
     const p = this._activePatient;
     const titles = {
-      'patients':       { title: 'Daftar Pasien',            subtitle: '' },
+      'patients':       { title: 'Daftar Pasien',            subtitle: 'Kelola data & kunjungan pasien' },
       'patient-detail': { title: p?.name ?? 'Profil Pasien', subtitle: 'Kunjungan & Monitoring' },
       'assessment':     { title: 'Initial Assessment',       subtitle: p?.name ?? '' },
       'monitoring':     { title: 'Weekly Monitoring',        subtitle: p?.name ?? '' },
       'photos':         { title: 'Foto & Catatan',           subtitle: p?.name ?? '' },
+      'treatments':     { title: 'Master Paket Perawatan',   subtitle: 'Paket sliming & treatment klinik' },
     };
 
     const t        = titles[page] ?? { title: page, subtitle: '' };
@@ -242,7 +261,7 @@ const App = {
       subEl.textContent = t.subtitle;
       subEl.classList.toggle('hidden', !t.subtitle);
     }
-    document.title = t.title + ' — Homecare WMS';
+    document.title = t.title + ' — Homecare Sliming';
   },
 };
 

@@ -198,4 +198,29 @@ CREATE TABLE IF NOT EXISTS `sync_queue` (
   `created_at`          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ------------------------------------------------------------
+-- Table: sliming_treatments — Master Paket Perawatan Sliming
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `sliming_treatments` (
+  `id`                    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `uuid`                  CHAR(36) NOT NULL UNIQUE,
+  `code`                  VARCHAR(50) NOT NULL UNIQUE COMMENT 'Kode paket mis. PKT-001',
+  `name`                  VARCHAR(200) NOT NULL COMMENT 'Nama paket perawatan',
+  `category`              VARCHAR(100) NULL COMMENT 'Kategori: Sliming, Detox, dll',
+  `duration_minutes`      SMALLINT UNSIGNED DEFAULT 0 COMMENT 'Durasi dalam menit',
+  `price`                 DECIMAL(12,0) DEFAULT 0 COMMENT 'Harga paket',
+  `description`           TEXT NULL,
+  `include_injections`    TINYINT(1) DEFAULT 0 COMMENT '1=sertakan suntikan',
+  `injection_type`        VARCHAR(100) NULL COMMENT 'Jenis suntikan: Semaglutide, dll',
+  `include_consultation`  TINYINT(1) DEFAULT 1 COMMENT '1=sertakan konsultasi',
+  `session_count`         TINYINT UNSIGNED DEFAULT 1 COMMENT 'Jumlah sesi',
+  `is_active`             TINYINT(1) DEFAULT 1 COMMENT '0=nonaktif, 1=aktif',
+  `sort_order`            INT DEFAULT 0 COMMENT 'Urutan tampil',
+  `created_at`            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`            TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at`            TIMESTAMP NULL DEFAULT NULL,
+  INDEX `idx_active` (`is_active`),
+  INDEX `idx_category` (`category`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#6366f1" />
+  <meta name="theme-color" content="#0a0f1c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="HCW Manager" />
-  <title>Homecare Weight Management</title>
+  <meta name="apple-mobile-web-app-title" content="HCW Sliming" />
+  <title>Homecare Sliming — Premium Weight Management</title>
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- Fonts: Playfair Display (luxury serif) + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,9 +25,88 @@
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans:  ['Inter', 'system-ui', 'sans-serif'],
+          },
           colors: {
-            brand:   { DEFAULT: '#6366f1', dark: '#4f46e5', light: '#818cf8' },
-            surface: { DEFAULT: '#1e293b', dark: '#0f172a', light: '#334155' }
+            // Luxury Gold Palette
+            gold: {
+              50:  '#FFF8E6',
+              100: '#FDEFC4',
+              200: '#F7DE87',
+              300: '#EBC550',
+              400: '#D4A537',
+              500: '#B8860B',   // classic dark gold
+              600: '#9A6B07',
+              700: '#7A520A',
+              800: '#5C3E0C',
+              900: '#3D2A0B',
+            },
+            // Deep Emerald
+            emeraldLux: {
+              50:  '#ECFDF5',
+              400: '#34D399',
+              500: '#10B981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065F46',
+              900: '#064E3B',
+            },
+            // Rose Gold
+            roseGold: {
+              300: '#F4A7B3',
+              400: '#E87C92',
+              500: '#D4546B',
+              600: '#B83A52',
+            },
+            // Dark Luxury Surfaces
+            lux: {
+              bg:       '#070B14',  // deep midnight
+              surface:  '#0F172A',  // slate-900
+              card:     '#111C34',  // soft navy card
+              card2:    'rgba(17,28,52,0.7)',
+              border:   'rgba(212,165,55,0.18)', // subtle gold
+              border2:  'rgba(255,255,255,0.07)',
+              text:     '#E8E3D3',  // warm off-white
+              muted:    '#8A8273',  // warm gray
+            }
+          },
+          backgroundImage: {
+            'luxury-radial': 'radial-gradient(ellipse at top, #1a1f3a 0%, #070B14 55%, #000 100%)',
+            'gold-gradient': 'linear-gradient(135deg, #FFD700 0%, #D4A537 45%, #B8860B 100%)',
+            'gold-soft': 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(184,134,11,0.06))',
+            'emerald-soft': 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(4,120,87,0.06))',
+          },
+          boxShadow: {
+            'gold': '0 10px 30px -5px rgba(184,134,11,0.25), 0 0 0 1px rgba(212,165,55,0.15)',
+            'card': '0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 40px -20px rgba(0,0,0,0.6)',
+            'btn-gold': '0 8px 24px -6px rgba(212,165,55,0.55)',
+            'btn-emerald': '0 8px 24px -6px rgba(16,185,129,0.5)',
+          },
+          animation: {
+            'shimmer': 'shimmer 3s linear infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+          },
+          keyframes: {
+            shimmer: {
+              '0%':   { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+            float: {
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%':     { transform: 'translateY(-12px)' },
+            },
+            fadeIn: {
+              from: { opacity: '0' },
+              to:   { opacity: '1' },
+            },
+            slideUp: {
+              from: { opacity: '0', transform: 'translateY(16px)' },
+              to:   { opacity: '1', transform: 'translateY(0)' },
+            }
           }
         }
       }
@@ -33,142 +117,314 @@
   <link rel="stylesheet" href="assets/css/app.css" />
 </head>
 
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-lux-bg text-lux-text font-sans min-h-screen antialiased selection:bg-gold-500/30 selection:text-gold-100">
 
   <!-- ═══════════════════════════════════════════════════════
-       SIDEBAR
+       HALAMAN LOGIN — Luxury Gold Edition
+  ════════════════════════════════════════════════════════ -->
+  <div id="page-login"
+    class="fixed inset-0 z-[100] hidden flex-col md:flex-row
+           bg-luxury-radial overflow-hidden">
+
+    <!-- Left Panel: Branding (Desktop) -->
+    <div class="hidden md:flex md:w-1/2 relative overflow-hidden items-center justify-center p-16">
+      <!-- Decorative glow -->
+      <div class="absolute top-1/4 -left-20 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-10 right-10 w-80 h-80 bg-emeraldLux-500/10 rounded-full blur-3xl"></div>
+
+      <div class="relative z-10 max-w-lg animate-fade-in">
+        <!-- Logo besar -->
+        <div class="mb-10">
+          <div class="w-24 h-24 rounded-3xl bg-gold-gradient shadow-gold flex items-center justify-center mb-8 animate-float">
+            <svg class="w-12 h-12 text-lux-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+
+          <h1 class="font-serif text-5xl font-bold leading-tight text-white mb-3">
+            <span class="bg-gold-gradient bg-clip-text text-transparent">Homecare</span><br>
+            Sliming <span class="text-emeraldLux-400">Center</span>
+          </h1>
+          <p class="text-lux-muted text-lg mb-8 font-light leading-relaxed">
+            Premium weight management system untuk klinik Anda.
+            Kelola pasien, monitoring progress, dan perawatan dengan elegant & profesional.
+          </p>
+        </div>
+
+        <!-- Feature list -->
+        <ul class="space-y-5">
+          ${features_login.map(f => `
+            <li class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gold-soft border border-gold-500/20 flex items-center justify-center text-gold-300">
+                ${f.icon}
+              </div>
+              <div>
+                <h3 class="text-white font-semibold mb-0.5">${f.title}</h3>
+                <p class="text-sm text-lux-muted">${f.desc}</p>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+
+        <!-- Footer brand -->
+        <div class="absolute bottom-0 left-16 right-16 py-8 border-t border-white/5">
+          <p class="text-xs text-lux-muted/60">© ${new Date().getFullYear()} Homecare Sliming WMS — v1.2.0 Premium Edition</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Form Login -->
+    <div class="flex-1 flex items-center justify-center p-6 sm:p-10 relative">
+      <!-- Mobile brand -->
+      <div class="md:hidden absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <div class="w-16 h-16 rounded-2xl bg-gold-gradient shadow-gold flex items-center justify-center mb-3">
+          <svg class="w-8 h-8 text-lux-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </div>
+        <h1 class="font-serif text-2xl font-bold text-white">
+          <span class="bg-gold-gradient bg-clip-text text-transparent">Homecare</span> Sliming
+        </h1>
+      </div>
+
+      <!-- Login Card -->
+      <div id="login-card"
+        class="relative w-full max-w-md animate-slide-up">
+
+        <!-- Gold corner accents -->
+        <div class="absolute -top-px -left-px w-8 h-8 border-t border-l border-gold-400/40 rounded-tl-2xl"></div>
+        <div class="absolute -top-px -right-px w-8 h-8 border-t border-r border-gold-400/40 rounded-tr-2xl"></div>
+        <div class="absolute -bottom-px -left-px w-8 h-8 border-b border-l border-gold-400/40 rounded-bl-2xl"></div>
+        <div class="absolute -bottom-px -right-px w-8 h-8 border-b border-r border-gold-400/40 rounded-br-2xl"></div>
+
+        <div class="bg-lux-card2 backdrop-blur-xl border border-lux-border rounded-3xl p-8 sm:p-10 shadow-card">
+
+          <!-- Header -->
+          <div class="mb-8 text-center md:text-left">
+            <h2 class="font-serif text-3xl font-bold text-white mb-2">Selamat Datang</h2>
+            <p class="text-lux-muted text-sm">Masuk ke dashboard admin klinik</p>
+          </div>
+
+          <form id="login-form" onsubmit="Auth.submitLogin(event)" class="space-y-6">
+
+            <!-- Username -->
+            <div class="group">
+              <label class="block text-xs font-semibold text-lux-muted mb-2 uppercase tracking-wider">
+                Username
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gold-500/50 group-focus-within:text-gold-400 transition-colors">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </span>
+                <input type="text" name="username" id="login-username" autocomplete="username" required
+                  placeholder="admin"
+                  class="lux-input pl-12">
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="group">
+              <label class="block text-xs font-semibold text-lux-muted mb-2 uppercase tracking-wider">
+                Password
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gold-500/50 group-focus-within:text-gold-400 transition-colors">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </span>
+                <input type="password" name="password" id="login-password" autocomplete="current-password" required
+                  placeholder="••••••••"
+                  class="lux-input pl-12 pr-12">
+                <button type="button" onclick="Auth.togglePassword()"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-lux-muted hover:text-gold-400 transition-colors">
+                  <svg id="eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember -->
+            <div class="flex items-center justify-between text-sm">
+              <label class="flex items-center gap-2 cursor-pointer text-lux-muted hover:text-white transition-colors">
+                <input type="checkbox" name="remember" class="w-4 h-4 accent-gold-500 rounded bg-lux-card border-gold-500/30">
+                <span>Ingat saya</span>
+              </label>
+              <a href="#" onclick="showToast('Hubungi administrator', 'info'); return false;"
+                class="text-gold-400 hover:text-gold-300 font-medium transition-colors">Lupa password?</a>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="login-btn"
+              class="w-full py-3.5 rounded-xl font-semibold text-lux-bg
+                     bg-gold-gradient hover:brightness-110 active:brightness-95
+                     shadow-btn-gold transition-all duration-300
+                     flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+              </svg>
+              <span>Masuk ke Dashboard</span>
+            </button>
+
+            <!-- Alert default creds -->
+            <div class="pt-4 border-t border-white/5 mt-2">
+              <p class="text-xs text-lux-muted/70 text-center leading-relaxed">
+                <span class="text-gold-400">Default:</span>
+                username <code class="text-gold-200 bg-gold-500/10 px-1.5 py-0.5 rounded">admin</code>
+                &nbsp;•&nbsp; password <code class="text-gold-200 bg-gold-500/10 px-1.5 py-0.5 rounded">admin123</code>
+              </p>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SIDEBAR — Luxury Gold
   ════════════════════════════════════════════════════════ -->
   <aside id="sidebar"
-    class="fixed top-0 left-0 h-full w-64 bg-slate-800 border-r border-slate-700
-           z-50 transform -translate-x-full transition-transform duration-300
-           md:translate-x-0 flex flex-col"
-    aria-label="Navigasi utama">
+    class="fixed top-0 left-0 h-full w-72 z-50 transform -translate-x-full transition-transform duration-300
+           md:translate-x-0 flex flex-col
+           bg-gradient-to-b from-lux-card via-[#0c1428] to-lux-bg
+           border-r border-lux-border">
 
-    <!-- Logo -->
-    <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-700 flex-shrink-0">
-      <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0">
-        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- Logo Area -->
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-lux-border flex-shrink-0">
+      <div class="w-11 h-11 rounded-2xl bg-gold-gradient shadow-gold flex items-center justify-center flex-shrink-0">
+        <svg class="w-6 h-6 text-lux-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0
-               002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2
-               2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2
-               2 0 01-2-2z"/>
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
         </svg>
       </div>
-      <div>
-        <p class="text-sm font-bold leading-tight text-white">Homecare WMS</p>
-        <p class="text-xs text-slate-400">Weight Management</p>
+      <div class="min-w-0">
+        <p class="font-serif text-base font-bold leading-tight text-white">
+          <span class="bg-gold-gradient bg-clip-text text-transparent">HC Sliming</span>
+        </p>
+        <p class="text-[11px] text-lux-muted font-medium">Weight Management</p>
       </div>
     </div>
 
     <!-- Nav Links -->
-    <nav class="flex-1 overflow-y-auto p-3 space-y-0.5" role="navigation">
+    <nav class="flex-1 overflow-y-auto px-4 py-4 space-y-1" role="navigation">
 
-      <!-- Daftar Pasien -->
+      <!-- Dashboard -->
       <a href="#" data-page="patients"
-        class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl
-               text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        class="nav-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-lux-muted
+               hover:bg-white/[0.03] hover:text-white transition-all duration-200 group">
+        <svg class="w-5 h-5 group-hover:text-gold-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10
                0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0
                015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0
                0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        <span class="text-sm font-medium">Daftar Pasien</span>
+        <span class="text-sm font-medium flex-1">Daftar Pasien</span>
       </a>
 
       <!-- Detail Pasien (muncul setelah pilih pasien) -->
       <a href="#" data-page="patient-detail" id="nav-patient-detail"
-        class="nav-link hidden flex items-center gap-3 px-3 py-3 rounded-xl
-               text-slate-300 hover:bg-slate-700 hover:text-white transition-colors
-               border border-indigo-700/30 bg-indigo-900/20">
-        <svg class="w-5 h-5 flex-shrink-0 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        class="nav-link hidden items-center gap-3 px-4 py-3.5 rounded-2xl text-white
+               bg-gold-soft border border-gold-500/20">
+        <svg class="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-white truncate" id="nav-active-name">Profil Pasien</p>
-          <p class="text-xs text-indigo-400">Kunjungan aktif</p>
+          <p class="text-sm font-semibold truncate" id="nav-active-name">Profil Pasien</p>
+          <p class="text-[11px] text-gold-400">Kunjungan aktif</p>
         </div>
       </a>
 
-      <!-- Divider: Data Klinis -->
-      <div class="pt-2 pb-1">
-        <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <!-- Divider -->
+      <div class="pt-5 pb-2 px-2">
+        <p class="text-[10px] font-bold text-lux-muted/60 uppercase tracking-[0.15em]">
+          Master Data
+        </p>
+      </div>
+
+      <!-- Perawatan Sliming -->
+      <a href="#" data-page="treatments"
+        class="nav-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-lux-muted
+               hover:bg-white/[0.03] hover:text-white transition-all duration-200 group">
+        <svg class="w-5 h-5 group-hover:text-emeraldLux-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <span class="text-sm font-medium flex-1">Paket Perawatan</span>
+        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emeraldLux-500/15 text-emeraldLux-400 border border-emeraldLux-500/20">MASTER</span>
+      </a>
+
+      <!-- Divider -->
+      <div class="pt-5 pb-2 px-2">
+        <p class="text-[10px] font-bold text-lux-muted/60 uppercase tracking-[0.15em]">
           Akses Cepat
         </p>
       </div>
 
-      <!-- Assessment -->
-      <a href="#" data-page="assessment"
-        class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl
-               text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0
-               002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0
-               002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-        </svg>
-        <span class="text-sm font-medium">Initial Assessment</span>
-      </a>
-
-      <!-- Monitoring -->
-      <a href="#" data-page="monitoring"
-        class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl
-               text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0
-               002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0
-               012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0
-               0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        <span class="text-sm font-medium">Weekly Monitoring</span>
-      </a>
-
-      <!-- Foto & Catatan -->
-      <a href="#" data-page="photos"
-        class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl
-               text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2
-               2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2
-               0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        <span class="text-sm font-medium">Foto &amp; Catatan</span>
-      </a>
-
+      ${QUICK_MENU_ITEMS.map(m => `
+        <a href="#" data-page="${m.page}"
+          class="nav-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-lux-muted
+                 hover:bg-white/[0.03] hover:text-white transition-all duration-200 group">
+          <span class="w-5 h-5 group-hover:text-gold-400 transition-colors">${m.icon}</span>
+          <span class="text-sm font-medium flex-1">${m.label}</span>
+        </a>
+      `).join('')}
     </nav>
 
-    <!-- Sync Status (footer sidebar) -->
-    <div class="flex-shrink-0 p-4 border-t border-slate-700 space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-400">Sinkronisasi</span>
-        <button id="btn-manual-sync"
-          class="text-xs text-indigo-400 hover:text-indigo-300
-                 flex items-center gap-1 transition-colors">
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0
-                 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+    <!-- Sync Status + User (footer sidebar) -->
+    <div class="flex-shrink-0 px-4 py-4 border-t border-lux-border space-y-3">
+
+      <!-- User info -->
+      <div class="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+        <div class="w-10 h-10 rounded-xl bg-gold-gradient flex items-center justify-center flex-shrink-0 shadow-gold">
+          <span id="user-avatar" class="text-sm font-bold text-lux-bg">A</span>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p id="user-display" class="text-sm font-semibold text-white truncate">Administrator</p>
+          <p class="text-[11px] text-gold-400">Online</p>
+        </div>
+        <button onclick="Auth.logout()" title="Logout"
+          class="p-2 rounded-lg hover:bg-roseGold-500/15 hover:text-roseGold-400 text-lux-muted transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
           </svg>
-          Sync sekarang
         </button>
       </div>
-      <div class="flex items-center gap-2">
-        <span id="sync-dot" class="w-2 h-2 rounded-full badge-online flex-shrink-0"></span>
-        <span id="sync-status-text" class="text-xs text-slate-300">Online</span>
-      </div>
-      <p id="sync-last-time" class="text-xs text-slate-500">—</p>
-      <div id="sync-pending-badge" class="hidden text-xs text-amber-400">
-        <span id="sync-pending-count">0</span> data belum tersinkron
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] text-lux-muted">Sinkronisasi</span>
+          <button id="btn-manual-sync"
+            class="text-[11px] text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0
+                   0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Sync
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="sync-dot" class="w-2 h-2 rounded-full badge-online flex-shrink-0"></span>
+          <span id="sync-status-text" class="text-xs text-lux-muted">Online</span>
+        </div>
+        <p id="sync-last-time" class="text-[11px] text-lux-muted/60">—</p>
+        <div id="sync-pending-badge" class="hidden text-[11px] text-amber-400 font-medium">
+          <span id="sync-pending-count">0</span> data pending
+        </div>
       </div>
     </div>
   </aside>
 
-  <!-- Sidebar overlay (mobile tap-to-close) -->
+  <!-- Sidebar overlay -->
   <div id="drawer-overlay" onclick="closeSidebar()"></div>
 
 
@@ -176,49 +432,45 @@
        TOPBAR
   ════════════════════════════════════════════════════════ -->
   <header id="topbar"
-    class="fixed top-0 left-0 right-0 md:left-64 h-14
-           bg-slate-800/95 backdrop-blur border-b border-slate-700
-           z-30 flex items-center px-4 gap-3">
+    class="fixed top-0 left-0 right-0 md:left-72 h-16 z-30 flex items-center px-5 gap-4
+           bg-lux-card/80 backdrop-blur-xl border-b border-lux-border">
 
     <!-- Hamburger (mobile) -->
     <button onclick="toggleSidebar()"
-      class="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-700"
-      aria-label="Buka menu">
+      class="md:hidden p-2 rounded-xl text-lux-muted hover:bg-white/5 hover:text-white transition-all">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
 
-    <!-- Breadcrumb / Page Title -->
+    <!-- Breadcrumb / Title -->
     <div class="flex-1 min-w-0">
-      <h1 id="page-title" class="text-sm font-semibold text-white truncate">
+      <h1 id="page-title" class="font-serif text-lg font-semibold text-white truncate">
         Daftar Pasien
       </h1>
-      <p id="page-subtitle" class="text-xs text-slate-400 hidden truncate"></p>
+      <p id="page-subtitle" class="text-xs text-lux-muted hidden truncate"></p>
     </div>
 
     <!-- Active Patient Pill -->
     <div id="active-patient-pill"
-      class="hidden items-center gap-2 bg-slate-700/80 rounded-full px-3 py-1.5
-             cursor-pointer hover:bg-slate-600 transition-colors"
-      onclick="App.goToPage('patient-detail')"
-      title="Buka profil pasien">
-      <div class="w-6 h-6 rounded-full bg-indigo-600 flex items-center
-                  justify-center text-xs font-bold text-white"
-        id="patient-pill-avatar">?</div>
+      class="hidden items-center gap-2.5 bg-white/[0.03] border border-lux-border rounded-full
+             px-3 py-1.5 cursor-pointer hover:bg-gold-soft hover:border-gold-500/20 transition-all"
+      onclick="App.goToPage('patient-detail')" title="Buka profil pasien">
+      <div id="patient-pill-avatar"
+        class="w-7 h-7 rounded-lg bg-gold-gradient flex items-center justify-center text-[11px] font-bold text-lux-bg">?</div>
       <span id="patient-pill-name"
-        class="text-xs font-medium text-white max-w-[100px] truncate"></span>
-      <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        class="text-xs font-semibold text-white max-w-[120px] truncate"></span>
+      <svg class="w-3 h-3 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
       </svg>
     </div>
 
-    <!-- Network indicator -->
-    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-700/60
-                flex-shrink-0">
-      <span id="net-dot" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
-      <span id="net-label" class="text-xs text-slate-300">Online</span>
+    <!-- Network + Quick Actions -->
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emeraldLux-500/10 border border-emeraldLux-500/20">
+        <span id="net-dot" class="w-2 h-2 rounded-full bg-emeraldLux-400"></span>
+        <span id="net-label" class="text-xs font-medium text-emeraldLux-400">Online</span>
+      </div>
     </div>
   </header>
 
@@ -226,91 +478,238 @@
   <!-- ═══════════════════════════════════════════════════════
        MAIN CONTENT
   ════════════════════════════════════════════════════════ -->
-  <main id="main-content" class="md:ml-64 pt-14 min-h-screen">
+  <main id="main-content" class="md:ml-72 pt-16 min-h-screen bg-lux-bg">
 
-    <!-- ── PAGE: Daftar Pasien ── -->
-    <div id="page-patients" class="page p-4 md:p-6">
+    <!-- PAGE: Daftar Pasien -->
+    <div id="page-patients" class="page p-4 md:p-8">
       <!-- Diisi oleh UIPatients.render() -->
     </div>
 
-    <!-- ── PAGE: Detail / Hub Pasien (3 tab di dalam) ── -->
-    <div id="page-patient-detail" class="page hidden p-4 md:p-6">
+    <!-- PAGE: Detail Pasien -->
+    <div id="page-patient-detail" class="page hidden p-4 md:p-8">
       <!-- Diisi oleh UIPatientDetail.render() -->
     </div>
 
-    <!-- ── PAGE: Initial Assessment (standalone, akses cepat) ── -->
-    <div id="page-assessment" class="page hidden p-4 md:p-6">
+    <!-- PAGE: Initial Assessment -->
+    <div id="page-assessment" class="page hidden p-4 md:p-8">
       <!-- Diisi oleh UIAssessment.render() -->
     </div>
 
-    <!-- ── PAGE: Weekly Monitoring (standalone, akses cepat) ── -->
-    <div id="page-monitoring" class="page hidden p-4 md:p-6">
+    <!-- PAGE: Weekly Monitoring -->
+    <div id="page-monitoring" class="page hidden p-4 md:p-8">
       <!-- Diisi oleh UIMonitoring.render() -->
     </div>
 
-    <!-- ── PAGE: Foto & Catatan (standalone, akses cepat) ── -->
-    <div id="page-photos" class="page hidden p-4 md:p-6">
+    <!-- PAGE: Foto & Catatan -->
+    <div id="page-photos" class="page hidden p-4 md:p-8">
       <!-- Diisi oleh UIPhotos.render() -->
+    </div>
+
+    <!-- PAGE: MASTER PAKET PERAWATAN -->
+    <div id="page-treatments" class="page hidden p-4 md:p-8">
+      <!-- Diisi oleh UITreatments.render() -->
     </div>
 
   </main>
 
 
   <!-- ═══════════════════════════════════════════════════════
-       MODAL — Edit / Quick Register Pasien
+       MODAL PASIEN
   ════════════════════════════════════════════════════════ -->
   <div id="modal-patient"
     class="hidden fixed inset-0 z-50 items-center justify-center p-4"
-    role="dialog" aria-modal="true" aria-labelledby="modal-patient-title">
+    role="dialog" aria-modal="true">
 
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-md"
       onclick="closePatientModal()"></div>
 
     <!-- Panel -->
-    <div class="relative bg-slate-800 rounded-2xl w-full max-w-xl
-                max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-700">
+    <div class="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto
+                bg-lux-card border border-lux-border rounded-3xl shadow-card animate-slide-up">
 
-      <!-- Header modal -->
-      <div class="sticky top-0 bg-slate-800 flex items-center justify-between
-                  p-5 border-b border-slate-700 z-10">
-        <h2 id="modal-patient-title" class="text-base font-bold text-white">
-          Daftarkan Pasien
-        </h2>
+      <!-- Gold corner accents -->
+      <div class="absolute top-0 left-0 w-10 h-10 border-t border-l border-gold-400/30 rounded-tl-3xl pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-10 h-10 border-t border-r border-gold-400/30 rounded-tr-3xl pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-10 h-10 border-b border-l border-gold-400/30 rounded-bl-3xl pointer-events-none"></div>
+      <div class="absolute bottom-0 right-0 w-10 h-10 border-b border-r border-gold-400/30 rounded-br-3xl pointer-events-none"></div>
+
+      <!-- Header -->
+      <div class="sticky top-0 z-10 bg-lux-card/95 backdrop-blur flex items-center justify-between
+                  px-7 py-5 border-b border-lux-border rounded-t-3xl">
+        <div>
+          <h2 id="modal-patient-title" class="font-serif text-xl font-bold text-white">
+            Daftarkan Pasien
+          </h2>
+          <p class="text-xs text-lux-muted mt-0.5">Lengkapi data dasar pasien</p>
+        </div>
         <button onclick="closePatientModal()"
-          class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 transition-colors"
-          aria-label="Tutup">
+          class="p-2 rounded-xl hover:bg-white/5 text-lux-muted hover:text-white transition-all">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
 
-      <!-- Body (diisi oleh UIPatients) -->
-      <div id="modal-patient-body" class="p-5">
+      <!-- Body -->
+      <div id="modal-patient-body" class="p-7">
       </div>
     </div>
   </div>
 
 
-  <!-- ═══════════════════════════════════════════════════════
-       TOAST CONTAINER
-  ════════════════════════════════════════════════════════ -->
+  <!-- MODAL TREATMENT (paket perawatan) -->
+  <div id="modal-treatment"
+    class="hidden fixed inset-0 z-50 items-center justify-center p-4"
+    role="dialog" aria-modal="true">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeTreatmentModal()"></div>
+    <div class="relative w-full max-w-xl max-h-[92vh] overflow-y-auto
+                bg-lux-card border border-lux-border rounded-3xl shadow-card animate-slide-up">
+      <div class="sticky top-0 z-10 bg-lux-card/95 backdrop-blur flex items-center justify-between
+                  px-7 py-5 border-b border-lux-border rounded-t-3xl">
+        <div>
+          <h2 id="modal-treatment-title" class="font-serif text-xl font-bold text-white">
+            Tambah Paket Perawatan
+          </h2>
+          <p class="text-xs text-lux-muted mt-0.5">Master data paket sliming</p>
+        </div>
+        <button onclick="closeTreatmentModal()"
+          class="p-2 rounded-xl hover:bg-white/5 text-lux-muted hover:text-white transition-all">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div id="modal-treatment-body" class="p-7"></div>
+    </div>
+  </div>
+
+
+  <!-- TOAST CONTAINER -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 
-  <!-- ═══════════════════════════════════════════════════════
-       SCRIPTS  (urutan loading penting!)
-  ════════════════════════════════════════════════════════ -->
+  <!-- ========================================================
+       INLINE SCRIPT: template literals data + auth init
+  ========================================================= -->
+  <script>
+    // Data untuk quick menu sidebar (didefinisikan SEBELUM load app.js)
+    const QUICK_MENU_ITEMS = [
+      { page:'assessment', label:'Initial Assessment',
+        icon:`<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>` },
+      { page:'monitoring', label:'Weekly Monitoring',
+        icon:`<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>` },
+      { page:'photos',     label:'Foto & Catatan',
+        icon:`<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>` },
+    ];
 
-  <!-- Pondasi -->
+    const features_login = [
+      { title:'Pasien & Monitoring', desc:'Kelola data pasien & progress mingguan lengkap',
+        icon:`<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`},
+      { title:'Master Paket Perawatan', desc:'Atur paket sliming, harga & treatment',
+        icon:`<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>`},
+      { title:'Auto Deploy Webhook', desc:'Push ke Git, auto deploy ke hosting',
+        icon:`<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>`},
+    ];
+
+    // Auth module (inline, karena dipanggil sebelum script lain)
+    const Auth = {
+      _base: null,
+      _getBase() {
+        if (this._base) return this._base;
+        const base = window.location.pathname.replace(/\/[^/]*$/, '');
+        return this._base = base + '/api';
+      },
+
+      async _req(endpoint, method='GET', body=null) {
+        const opts = { method, credentials: 'same-origin', headers: {} };
+        if (body) {
+          opts.headers['Content-Type'] = 'application/json';
+          opts.body = JSON.stringify(body);
+        }
+        try {
+          const res = await fetch(`${this._getBase()}/${endpoint}`, opts);
+          return await res.json();
+        } catch (e) {
+          return { success:false, message: e.message };
+        }
+      },
+
+      async check() {
+        return await this._req('auth.php?action=check');
+      },
+
+      async submitLogin(e) {
+        e.preventDefault();
+        const btn = document.getElementById('login-btn');
+        const orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" class="opacity-75"/></svg> Memproses...`;
+        try {
+          const fd = new FormData(e.target);
+          const res = await this._req('auth.php?action=login', 'POST', {
+            username: fd.get('username'),
+            password: fd.get('password'),
+          });
+          if (res.success) {
+            showToast(`✅ Selamat datang, ${res.user.username}!`, 'success');
+            document.getElementById('user-avatar').textContent = (res.user.username || 'A').toUpperCase()[0];
+            document.getElementById('user-display').textContent = res.user.username || 'Administrator';
+            this._hideLogin();
+          } else {
+            showToast('❌ ' + (res.message || 'Gagal login'), 'error', 5000);
+          }
+        } catch(err) {
+          showToast('❌ Error: ' + err.message, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = orig;
+        }
+      },
+
+      togglePassword() {
+        const p  = document.getElementById('login-password');
+        const ey = document.getElementById('eye-icon');
+        if (!p) return;
+        if (p.type === 'password') {
+          p.type = 'text';
+          ey.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`;
+        } else {
+          p.type = 'password';
+          ey.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+        }
+      },
+
+      async logout() {
+        if (!confirm('Keluar dari aplikasi?')) return;
+        await this._req('auth.php?action=logout', 'POST');
+        this._showLogin();
+        showToast('Anda telah logout', 'info');
+      },
+
+      _hideLogin() {
+        const el = document.getElementById('page-login');
+        if (!el) return;
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      },
+
+      _showLogin() {
+        const el = document.getElementById('page-login');
+        if (!el) return;
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      }
+    };
+  </script>
+
+  <!-- SCRIPTS  (order penting!) -->
   <script src="assets/js/utils.js"></script>
   <script src="assets/js/db.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/sync.js"></script>
 
-  <!-- OCR (dimuat sebelum UI modules) -->
+  <!-- OCR -->
   <script src="assets/js/ocr.js"></script>
   <script src="assets/js/ui-ocr.js"></script>
 
@@ -320,8 +719,9 @@
   <script src="assets/js/ui-photos.js"></script>
   <script src="assets/js/ui-patient-detail.js"></script>
   <script src="assets/js/ui-patients.js"></script>
+  <script src="assets/js/ui-treatments.js"></script>
 
-  <!-- App Router (terakhir, setelah semua modul siap) -->
+  <!-- App Router -->
   <script src="assets/js/app.js"></script>
 
 </body>

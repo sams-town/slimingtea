@@ -19,6 +19,9 @@ uploads/photos/*
 .env
 *.env
 
+# Config berisi credential DB & API token (JANGAN commit)
+config/config.php
+
 # OS files
 .DS_Store
 Thumbs.db
