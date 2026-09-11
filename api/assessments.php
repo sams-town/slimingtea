@@ -61,7 +61,7 @@ if ($action === 'save' && $method === 'POST') {
         $set  = buildSet(array_keys($data));
         $data[':id'] = $existing['id'];
 
-        $stmt = $pdo->prepare("UPDATE initial_assessments SET $set, updated_at = datetime('now') WHERE id = :id");
+        $stmt = $pdo->prepare("UPDATE initial_assessments SET $set, updated_at = NOW() WHERE id = :id");
         $stmt->execute($data);
 
         jsonResponse(['success' => true, 'id' => $existing['id'], 'uuid' => $existing['uuid'], 'action' => 'updated']);

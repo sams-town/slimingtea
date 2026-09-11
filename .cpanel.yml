@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/samst652/public_html/slimingtea
+    - /bin/cp -R * $DEPLOYPATH

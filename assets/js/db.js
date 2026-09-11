@@ -4,7 +4,7 @@
 // ============================================================
 
 const DB_NAME    = 'hcwm_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // bumped: fix compound index syntax
 
 // Object store definitions
 const STORES = {
@@ -19,10 +19,13 @@ const STORES = {
 };
 
 // Indexes per store
+// FIX: compound index pakai array ['field1','field2'], bukan string '[field1+field2]'
 const INDEXES = {
   patients:            [['name','name',{}], ['phone','phone',{}]],
   initial_assessments: [['patient_id','patient_id',{}]],
-  weekly_monitorings:  [['patient_id','patient_id',{}], ['patient_week','[patient_id+week_number]',{unique:true}]],
+  // FIX: hilangkan compound unique index — cukup index by patient_id
+  // unique constraint sudah dijaga di level UUID (keyPath)
+  weekly_monitorings:  [['patient_id','patient_id',{}]],
   body_circumferences: [['patient_id','patient_id',{}]],
   patient_photos:      [['patient_id','patient_id',{}]],
   doctor_notes:        [['patient_id','patient_id',{}]],

@@ -9,7 +9,7 @@ const API_BASE  = (() => {
   return base + '/api';
 })();
 
-const API_TOKEN = 'hcwm-samst652-2025-x9k2'; // harus sama dengan config.php
+const API_TOKEN = 'samstown2025'; // harus sama dengan config.php
 
 const API = {
   // ---- Base fetch wrapper ----

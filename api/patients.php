@@ -1,11 +1,6 @@
 <?php
 // ============================================================
-// API: /api/patients.php
-// GET    ?action=list   — daftar pasien (+ search ?q=)
-// GET    ?action=get&id= — detail pasien
-// POST   ?action=create
-// POST   ?action=update&id=
-// POST   ?action=delete&id=
+// API: /api/patients.php  —  MySQL/MariaDB compatible
 // ============================================================
 require_once __DIR__ . '/helpers.php';
 setCorsHeaders();
@@ -17,6 +12,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 $ALLOWED_FIELDS = [
     'uuid','name','dob','age','sex','phone','address','registration_date',
+    'registration_status','last_visit_date','visit_count',
     'diabetes','hypertension','dyslipidemia','hyperuricemia','heart_disease',
     'other_conditions','allergies','sleep_hours','sleep_quality',
     'activity_level','activity_detail','diet_pattern','diet_detail'
@@ -24,13 +20,13 @@ $ALLOWED_FIELDS = [
 
 // ---- LIST ----
 if ($action === 'list') {
-    $pg    = getPagination();
-    $q     = trim($_GET['q'] ?? '');
-    $where = 'WHERE deleted_at IS NULL';
+    $pg     = getPagination();
+    $q      = trim($_GET['q'] ?? '');
+    $where  = 'WHERE deleted_at IS NULL';
     $params = [];
 
     if ($q !== '') {
-        $where  .= ' AND (name LIKE :q OR phone LIKE :q2)';
+        $where       .= ' AND (name LIKE :q OR phone LIKE :q2)';
         $params[':q']  = "%$q%";
         $params[':q2'] = "%$q%";
     }
@@ -39,7 +35,9 @@ if ($action === 'list') {
     $total->execute($params);
     $count = (int)$total->fetchColumn();
 
-    $stmt = $pdo->prepare("SELECT * FROM patients $where ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+    $stmt = $pdo->prepare(
+        "SELECT * FROM patients $where ORDER BY created_at DESC LIMIT :limit OFFSET :offset"
+    );
     foreach ($params as $k => $v) $stmt->bindValue($k, $v);
     $stmt->bindValue(':limit',  $pg['limit'],  PDO::PARAM_INT);
     $stmt->bindValue(':offset', $pg['offset'], PDO::PARAM_INT);
@@ -70,36 +68,56 @@ if ($action === 'create' && $method === 'POST') {
     $body = getBody();
     $data = pick($body, $ALLOWED_FIELDS);
 
-    if (empty($data['name'])) jsonResponse(['success' => false, 'message' => 'Name is required'], 400);
-    if (empty($data['sex']))  jsonResponse(['success' => false, 'message' => 'Sex is required'], 400);
+    // Validasi wajib
+    if (empty($data['name'])) {
+        jsonResponse(['success' => false, 'message' => 'Nama pasien wajib diisi'], 400);
+    }
+    if (empty($data['sex'])) {
+        jsonResponse(['success' => false, 'message' => 'Jenis kelamin wajib diisi'], 400);
+    }
+    // Pastikan sex valid untuk MySQL ENUM
+    if (!in_array($data['sex'], ['male', 'female'])) {
+        jsonResponse(['success' => false, 'message' => 'Jenis kelamin tidak valid'], 400);
+    }
 
-    // UUID: pakai yang dikirim client (untuk offline sync) atau generate baru
-    $uuid = $body['uuid'] ?? generateUuid();
+    // UUID dari client (offline-first) atau generate baru
+    $uuid         = !empty($body['uuid']) ? $body['uuid'] : generateUuid();
     $data['uuid'] = $uuid;
 
+    // Default values
     if (empty($data['registration_date'])) {
         $data['registration_date'] = date('Y-m-d');
+    }
+    if (empty($data['registration_status'])) {
+        $data['registration_status'] = 'quick';
+    }
+    if (!isset($data['visit_count'])) {
+        $data['visit_count'] = 0;
+    }
+
+    // Cast boolean fields ke integer
+    foreach (['diabetes','hypertension','dyslipidemia','hyperuricemia','heart_disease'] as $f) {
+        if (isset($data[$f])) $data[$f] = (int)$data[$f];
     }
 
     $cols   = implode(', ', array_map(fn($k) => "`$k`", array_keys($data)));
     $places = implode(', ', array_map(fn($k) => ":$k", array_keys($data)));
-    $stmt   = $pdo->prepare("INSERT INTO patients ($cols) VALUES ($places)");
+    $stmt   = $pdo->prepare("INSERT INTO `patients` ($cols) VALUES ($places)");
 
     try {
         $stmt->execute($data);
         $newId = (int)$pdo->lastInsertId();
-
-        // Update sync_queue status jika ada
         markSynced($pdo, 'patients', $uuid);
-
         jsonResponse(['success' => true, 'id' => $newId, 'uuid' => $uuid], 201);
+
     } catch (PDOException $e) {
-        if (str_contains($e->getMessage(), 'UNIQUE')) {
-            // Duplicate UUID — update saja
-            $id = getPatientIdByUuid($pdo, $uuid);
-            jsonResponse(['success' => true, 'id' => $id, 'uuid' => $uuid, 'note' => 'already_exists']);
+        // Duplicate UUID → idempoten (untuk offline sync)
+        if (str_contains($e->getMessage(), 'Duplicate') ||
+            str_contains($e->getMessage(), 'UNIQUE')) {
+            $existId = getPatientIdByUuid($pdo, $uuid);
+            jsonResponse(['success' => true, 'id' => $existId, 'uuid' => $uuid, 'note' => 'already_exists']);
         }
-        jsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
+        jsonResponse(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()], 500);
     }
 }
 
@@ -109,24 +127,31 @@ if ($action === 'update' && $method === 'POST') {
     $body = getBody();
     $data = pick($body, $ALLOWED_FIELDS);
 
-    if (!$id) jsonResponse(['success' => false, 'message' => 'ID required'], 400);
-    if (empty($data))  jsonResponse(['success' => false, 'message' => 'No data'], 400);
+    if (!$id)       jsonResponse(['success' => false, 'message' => 'ID required'], 400);
+    if (empty($data)) jsonResponse(['success' => false, 'message' => 'No data'], 400);
 
-    $set  = buildSet(array_keys($data));
+    // Cast boolean fields
+    foreach (['diabetes','hypertension','dyslipidemia','hyperuricemia','heart_disease'] as $f) {
+        if (isset($data[$f])) $data[$f] = (int)$data[$f];
+    }
+
+    $set         = buildSet(array_keys($data));
     $data[':id'] = $id;
 
-    $stmt = $pdo->prepare("UPDATE patients SET $set, updated_at = datetime('now') WHERE id = :id");
+    // FIX: gunakan NOW() bukan NOW() — MySQL/MariaDB syntax
+    $stmt = $pdo->prepare("UPDATE `patients` SET $set, updated_at = NOW() WHERE id = :id");
     $stmt->execute($data);
 
     jsonResponse(['success' => true, 'updated' => $stmt->rowCount()]);
 }
 
-// ---- DELETE (soft) ----
+// ---- DELETE (soft delete) ----
 if ($action === 'delete' && $method === 'POST') {
     $id = (int)($_GET['id'] ?? 0);
     if (!$id) jsonResponse(['success' => false, 'message' => 'ID required'], 400);
 
-    $stmt = $pdo->prepare("UPDATE patients SET deleted_at = datetime('now') WHERE id = :id");
+    // FIX: gunakan NOW() bukan NOW()
+    $stmt = $pdo->prepare("UPDATE `patients` SET deleted_at = NOW() WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
     jsonResponse(['success' => true]);
@@ -134,16 +159,18 @@ if ($action === 'delete' && $method === 'POST') {
 
 jsonResponse(['success' => false, 'message' => 'Unknown action'], 400);
 
-// --- Helpers local ---
+// ── Local helpers ─────────────────────────────────────────────
 function getPatientIdByUuid(PDO $pdo, string $uuid): int {
-    $s = $pdo->prepare('SELECT id FROM patients WHERE uuid = :uuid');
+    $s = $pdo->prepare('SELECT id FROM `patients` WHERE uuid = :uuid');
     $s->execute([':uuid' => $uuid]);
     return (int)$s->fetchColumn();
 }
 
 function markSynced(PDO $pdo, string $table, string $uuid): void {
     try {
-        $s = $pdo->prepare("UPDATE sync_queue SET status='synced' WHERE table_name=:t AND record_uuid=:u");
+        $s = $pdo->prepare(
+            "UPDATE `sync_queue` SET status='synced' WHERE table_name=:t AND record_uuid=:u"
+        );
         $s->execute([':t' => $table, ':u' => $uuid]);
     } catch (Exception $e) { /* non-critical */ }
 }

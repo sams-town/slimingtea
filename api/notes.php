@@ -45,7 +45,7 @@ if ($action === 'save' && $method === 'POST') {
 
     if ($existId) {
         $stmt = $pdo->prepare(
-            "UPDATE doctor_notes SET note=:note, author=:auth, updated_at=datetime('now') WHERE id=:id"
+            "UPDATE doctor_notes SET note=:note, author=:auth, updated_at=NOW() WHERE id=:id"
         );
         $stmt->execute([':note' => $note, ':auth' => $auth, ':id' => $existId]);
         jsonResponse(['success' => true, 'id' => (int)$existId, 'uuid' => $uuid, 'action' => 'updated']);

@@ -28,7 +28,7 @@ define('MAX_UPLOAD_MB',   10);
 
 // ── Security ─────────────────────────────────────────────────
 // GANTI token ini setelah deploy pertama!
-define('API_TOKEN',   'hcwm-samst652-2025-x9k2');
+define('API_TOKEN',   'samstown2025');
 define('CORS_ORIGIN', '*');
 
 // ── Timezone ─────────────────────────────────────────────────

@@ -99,7 +99,7 @@ if ($action === 'save' && $method === 'POST') {
             if ($upd) {
                 $set  = buildSet(array_keys($upd));
                 $upd[':id'] = $id;
-                $pdo->prepare("UPDATE weekly_monitorings SET $set, updated_at=datetime('now') WHERE id=:id")->execute($upd);
+                $pdo->prepare("UPDATE weekly_monitorings SET $set, updated_at=NOW() WHERE id=:id")->execute($upd);
             }
             $results['monitoring'] = ['action' => 'updated', 'id' => $id];
         } else {
@@ -128,7 +128,7 @@ if ($action === 'save' && $method === 'POST') {
             if ($upd) {
                 $set  = buildSet(array_keys($upd));
                 $upd[':id'] = $id;
-                $pdo->prepare("UPDATE body_circumferences SET $set, updated_at=datetime('now') WHERE id=:id")->execute($upd);
+                $pdo->prepare("UPDATE body_circumferences SET $set, updated_at=NOW() WHERE id=:id")->execute($upd);
             }
             $results['circumference'] = ['action' => 'updated', 'id' => $id];
         } else {

@@ -60,7 +60,7 @@ if ($action === 'push' && $method === 'POST') {
                     if (!empty($data)) {
                         $set = buildSet(array_keys($data));
                         $data[':id'] = $existId;
-                        $pdo->prepare("UPDATE `$table` SET $set, updated_at=datetime('now') WHERE id=:id")->execute($data);
+                        $pdo->prepare("UPDATE `$table` SET $set, updated_at=NOW() WHERE id=:id")->execute($data);
                     }
                     $results[] = ['uuid' => $uuid, 'status' => 'updated', 'id' => (int)$existId];
 
@@ -76,7 +76,7 @@ if ($action === 'push' && $method === 'POST') {
 
                 } elseif ($op === 'delete' && $existId) {
                     if ($table === 'patients') {
-                        $pdo->prepare("UPDATE patients SET deleted_at=datetime('now') WHERE id=:id")
+                        $pdo->prepare("UPDATE patients SET deleted_at=NOW() WHERE id=:id")
                             ->execute([':id' => $existId]);
                     } else {
                         $pdo->prepare("DELETE FROM `$table` WHERE id=:id")->execute([':id' => $existId]);
